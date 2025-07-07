@@ -7,8 +7,10 @@ This guide will help you deploy the Notes Processor frontend to GitHub Pages.
 This repository is configured to automatically deploy to GitHub Pages using GitHub Actions. When you push changes to the `main` branch, the GitHub Actions workflow will:
 
 1. Build the frontend
-2. Copy the build files to the `docs` directory
-3. Deploy the `docs` directory to the `gh-pages` branch
+2. Copy the build files to the `docs` directory in the `main` branch
+3. Commit and push the updated `docs` directory
+
+GitHub Pages is configured to deploy from the `/docs` folder in the `main` branch.
 
 ## Manual Deployment
 
@@ -71,7 +73,7 @@ git push origin main
 3. Navigate to "Pages" in the left sidebar
 4. Under "Build and deployment", select:
    - Source: "Deploy from a branch"
-   - Branch: "gh-pages" / "/ (root)"
+   - Branch: "main" / "/docs"
 5. Click "Save"
 
 Your site will be published at `https://yourusername.github.io/Note_Processing/`
