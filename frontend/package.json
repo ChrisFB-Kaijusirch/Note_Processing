@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite --port 12000",
     "build": "vite build",
-    "preview": "vite preview --port 12000"
+    "preview": "vite preview --port 12000",
+    "deploy": "vite build && cp -r dist/* ../docs/"
   },
   "keywords": [
     "notes",
