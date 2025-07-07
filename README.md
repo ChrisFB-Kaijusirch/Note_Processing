@@ -1,54 +1,58 @@
 # Notes Processor
 
-A full-stack web application that allows users to upload handwritten notes (as PDFs or images), transcribe and process them into structured documents, and store them securely in the cloud using AWS.
+A full-stack web application that allows users to upload handwritten notes (as PDFs or images), transcribe and process them into structured documents, and store them securely in the cloud using AWS services.
 
-## Features
+## 🌟 Live Demo
 
-- Upload handwritten notes as images or PDFs
-- Process notes into various document types:
+The frontend of this application is deployed on GitHub Pages: [View Demo](https://chrisfb-kaijusirch.github.io/Note_Processing/)
+
+## ✨ Features
+
+- 📄 Upload handwritten notes as images or PDFs
+- 📝 Process notes into various document types:
   - Knowledge Library Articles
   - Standard Operating Procedures (SOPs)
   - Training Manuals
   - Policy Documents
-- AI-powered text extraction and document generation
-- Secure user authentication
-- Document management (view, search, download, print)
-- Responsive design for all devices
+- 🤖 AI-powered text extraction and document generation
+- 🔒 Secure user authentication
+- 📚 Document management (view, search, download, print)
+- 📱 Responsive design for all devices
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-- React.js with Vite
-- React Router for navigation
-- Tailwind CSS for styling
-- AWS SDK for JavaScript
+- ⚛️ **React.js** with Vite for fast development
+- 🧭 **React Router** for navigation
+- 🎨 **Tailwind CSS** for responsive styling
+- ☁️ **AWS SDK** for JavaScript
 
 ### Backend
-- Node.js with Express
-- AWS Services:
+- 🖥️ **Node.js** with Express
+- ☁️ **AWS Services**:
   - S3 for file storage
   - Textract for text extraction
   - DynamoDB for database
-- JWT for authentication
-- Multer for file uploads
+- 🔑 **JWT** for authentication
+- 📤 **Multer** for file uploads
 
 ### AI Processing
-- Local LLM integration (Ollama with Llama 3)
+- 🧠 **Local LLM** integration (Ollama with Llama 3)
 
-## Prerequisites
+## 📋 Prerequisites
 
-- Node.js (v16+)
-- npm or yarn
-- AWS Account with appropriate permissions
-- Ollama or other local LLM setup (optional)
+- 📦 Node.js (v16+)
+- 📦 npm or yarn
+- ☁️ AWS Account with appropriate permissions
+- 🧠 Ollama or other local LLM setup (optional)
 
-## Setup Instructions
+## 🚀 Setup Instructions
 
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd NotesProcessor
+git clone https://github.com/ChrisFB-Kaijusirch/Note_Processing.git
+cd Note_Processing
 ```
 
 ### 2. Frontend Setup
@@ -131,7 +135,7 @@ If you want to use a local LLM:
 2. Pull the Llama 3 model: `ollama pull llama3`
 3. Start the Ollama server: `ollama serve`
 
-## Running the Application
+## 🏃‍♂️ Running the Application
 
 ### Development Mode
 
@@ -171,7 +175,16 @@ cd backend
 npm start
 ```
 
-## Deployment
+## 🌐 Deployment
+
+### GitHub Pages (Frontend)
+
+This repository is configured with GitHub Actions to automatically deploy the frontend to GitHub Pages when changes are pushed to the main branch.
+
+For manual deployment:
+
+1. Build the frontend: `npm run build`
+2. Deploy to GitHub Pages: `npm run deploy`
 
 ### AWS Deployment
 
@@ -189,16 +202,38 @@ npm start
 4. Set up a process manager like PM2: `pm2 start server.js`
 5. (Optional) Set up a domain name and SSL certificate
 
-## Security Considerations
+### Additional Deployment Options
 
-- Always use HTTPS in production
-- Store sensitive information in environment variables
-- Implement proper input validation
-- Use secure authentication practices
-- Set up proper CORS configuration
-- Implement rate limiting to prevent abuse
-- Regularly update dependencies
+For more detailed deployment instructions, see:
+- [GitHub Pages Deployment Guide](./GITHUB_PAGES_DEPLOYMENT.md)
+- [Backend Deployment Guide](./BACKEND_DEPLOYMENT.md)
+- [AWS Setup Guide](./AWS_SETUP.md)
 
-## License
+## 🔒 Security Considerations
+
+- 🔐 Always use HTTPS in production
+- 🔑 Store sensitive information in environment variables
+- ✅ Implement proper input validation
+- 🛡️ Use secure authentication practices
+- 🌐 Set up proper CORS configuration
+- ⚠️ Implement rate limiting to prevent abuse
+- 🔄 Regularly update dependencies
+
+For more detailed security information, see the [AWS Setup Guide](./AWS_SETUP.md) and [AI Integration Guide](./AI_INTEGRATION.md).
+
+## 📝 License
 
 [MIT License](LICENSE)
+
+---
+
+## 📚 Documentation
+
+For more detailed information about the application, check out these guides:
+
+- [GitHub Setup Guide](./GITHUB_SETUP.md)
+- [GitHub Pages Deployment Guide](./GITHUB_PAGES_DEPLOYMENT.md)
+- [Backend Deployment Guide](./BACKEND_DEPLOYMENT.md)
+- [AWS Setup Guide](./AWS_SETUP.md)
+- [AI Integration Guide](./AI_INTEGRATION.md)
+- [Notes Processor Summary](./NOTES_PROCESSOR_SUMMARY.md)
