@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Handwritten Notes to PDF (Edit, Draw & Images)</title>
+<!-- Tesseract.js -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.1/dist/tesseract.min.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: #f4f7fa;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 1em;
+  }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.5em;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 600px;
+  }
+  h1 {
+    margin-top: 0;
+    font-size: 1.4em;
+    color: #4a90e2;
+    text-align: center;
+  }
+  input[type="file"] {
+    display: block;
+    margin: 1em auto;
+  }
+  textarea {
+    width: 100%;
+    height: 150px;
+    margin-top: 1em;
+    padding: 0.6em;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    font-size: 0.95em;
+  }
+  canvas {
+    display: block;
+    margin: 1em auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: crosshair;
+  }
+  button {
+    width: 100%;
+    background: #4a90e2;
+    color: #fff;
+    border: none;
+    padding: 0.8em;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 0.8em;
+    transition: background 0.2s;
+  }
+  button:hover:not(:disabled) {
+    background: #357ABD;
+  }
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  #status {
+    text-align: center;
+    margin-top: 0.5em;
+    font-size: 0.9em;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>📝 Handwritten Notes to PDF</h1>
+  <input type="file" id="fileInput" accept="image/png, image/jpeg" multiple>
+  <div id="status">Upload images to start OCR.</div>
+  <textarea id="textArea" placeholder="OCR text will appear here..."></textarea>
+  <canvas id="drawCanvas" width="500" height="300"></canvas>
+  <button id="clearCanvasBtn">Clear Drawing</button>
+  <button id="downloadBtn" disabled>Download PDF</button>
+</div>
+
+<script>
+(async () => {
+  const fileInput = document.getElementById('fileInput');
+  const textArea = document.getElementById('textArea');
+  const status = document.getElementById('status');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const canvas = document.getElementById('drawCanvas');
+  const clearCanvasBtn = document.getElementById('clearCanvasBtn');
+  const ctx = canvas.getContext('2d');
+
+  let drawing = false;
+  let originalImages = []; // to store data URLs of uploaded images
+
+  // Canvas drawing
+  canvas.addEventListener('mousedown', e => {
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+  });
+  canvas.addEventListener('mousemove', e => {
+    if (drawing) {
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    }
+  });
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mouseleave', () => drawing = false);
+
+  clearCanvasBtn.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+
+  // OCR and prepare text
+  fileInput.addEventListener('change', async () => {
+    textArea.value = '';
+    status.textContent = '🔍 Processing images...';
+    downloadBtn.disabled = true;
+    originalImages = [];
+
+    const files = Array.from(fileInput.files).filter(file =>
+      ['image/png', 'image/jpeg'].includes(file.type)
+    );
+
+    if (files.length === 0) {
+      status.textContent = '❗ Please upload JPEG or PNG images only.';
+      return;
+    }
+
+    let combinedText = '';
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const url = URL.createObjectURL(files[i]);
+
+        // Save image data as data URL for PDF later
+        const imgDataUrl = await new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(files[i]);
+        });
+        originalImages.push(imgDataUrl);
+
+        // OCR
+        const result = await Tesseract.recognize(url, 'eng');
+        const text = result.data.text.trim() || "(No text found)";
+        combinedText += `Page ${i+1}:\n${text}\n\n---\n\n`;
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error(e);
+        combinedText += `Page ${i+1}: OCR failed.\n\n---\n\n`;
+      }
+    }
+
+    textArea.value = combinedText;
+    status.textContent = '✅ OCR complete! Edit text if needed and add drawing.';
+    downloadBtn.disabled = false;
+  });
+
+  // Check if canvas is blank
+  function isCanvasBlank(cnv) {
+    const blank = document.createElement('canvas');
+    blank.width = cnv.width;
+    blank.height = cnv.height;
+    return cnv.toDataURL() === blank.toDataURL();
+  }
+
+  // Generate PDF
+  downloadBtn.addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica"); // explicitly set font to avoid strange chars
+    doc.setFontSize(12);
+
+    // Page 1: edited text
+    const text = textArea.value.trim() || "(No text provided)";
+    const lines = doc.splitTextToSize(text, 180);
+    doc.text("✏ Edited OCR Text:", 10, 15);
+    doc.text(lines, 10, 25);
+
+    // Page 2: drawing, only if not blank
+    if (!isCanvasBlank(canvas)) {
+      doc.addPage();
+      const imgDrawing = canvas.toDataURL('image/png');
+      doc.text("🖌 Your Drawing:", 10, 15);
+      doc.addImage(imgDrawing, 'PNG', 10, 25, 180, 100);
+    }
+
+    // Pages: original images
+    originalImages.forEach((img, index) => {
+      doc.addPage();
+      doc.text(`📸 Original Image ${index+1}:`, 10, 15);
+      doc.addImage(img, 'PNG', 10, 25, 180, 160);
+    });
+
+    doc.save('handwritten_notes.pdf');
+
+    // Clear everything after download
+    textArea.value = '';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    status.textContent = '🗑️ Data cleared after download.';
+    fileInput.value = '';
+    downloadBtn.disabled = true;
+    originalImages = [];
+  });
+})();
+</script>
+</body>
+</html>
